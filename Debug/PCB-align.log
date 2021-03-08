@@ -1,0 +1,116 @@
+﻿  PCB-align.cpp
+E:\project\PCB-align\PCB-align\PCB-align.cpp(44,20): warning C4018: “<”: 有符号/无符号不匹配
+E:\project\PCB-align\PCB-align\PCB-align.cpp(59,20): warning C4018: “<”: 有符号/无符号不匹配
+E:\project\PCB-align\PCB-align\PCB-align.cpp(203,23): warning C4244: “参数”: 从“int”转换到“_Tp”，可能丢失数据
+          with
+          [
+              _Tp=float
+          ]
+E:\project\PCB-align\PCB-align\PCB-align.cpp(203,20): warning C4244: “参数”: 从“int”转换到“_Tp”，可能丢失数据
+          with
+          [
+              _Tp=float
+          ]
+E:\project\PCB-align\PCB-align\PCB-align.cpp(234,23): warning C4244: “参数”: 从“int”转换到“_Tp”，可能丢失数据
+          with
+          [
+              _Tp=float
+          ]
+E:\project\PCB-align\PCB-align\PCB-align.cpp(234,20): warning C4244: “参数”: 从“int”转换到“_Tp”，可能丢失数据
+          with
+          [
+              _Tp=float
+          ]
+E:\project\PCB-align\PCB-align\PCB-align.cpp(267,80): warning C4244: “参数”: 从“int”转换到“_Tp”，可能丢失数据
+          with
+          [
+              _Tp=float
+          ]
+E:\project\PCB-align\PCB-align\PCB-align.cpp(267,48): warning C4244: “参数”: 从“int”转换到“_Tp”，可能丢失数据
+          with
+          [
+              _Tp=float
+          ]
+E:\project\PCB-align\PCB-align\PCB-align.cpp(268,80): warning C4244: “参数”: 从“int”转换到“_Tp”，可能丢失数据
+          with
+          [
+              _Tp=float
+          ]
+E:\project\PCB-align\PCB-align\PCB-align.cpp(268,48): warning C4244: “参数”: 从“int”转换到“_Tp”，可能丢失数据
+          with
+          [
+              _Tp=float
+          ]
+E:\project\PCB-align\PCB-align\PCB-align.cpp(291,32): warning C4244: “参数”: 从“int”转换到“_Tp”，可能丢失数据
+          with
+          [
+              _Tp=float
+          ]
+E:\project\PCB-align\PCB-align\PCB-align.cpp(291,29): warning C4244: “参数”: 从“int”转换到“_Tp”，可能丢失数据
+          with
+          [
+              _Tp=float
+          ]
+E:\project\PCB-align\PCB-align\PCB-align.cpp(296,20): warning C4018: “<”: 有符号/无符号不匹配
+E:\project\PCB-align\PCB-align\PCB-align.cpp(297,9): warning C4244: “初始化”: 从“_Tp”转换到“int”，可能丢失数据
+          with
+          [
+              _Tp=float
+          ]
+E:\project\PCB-align\PCB-align\PCB-align.cpp(298,9): warning C4244: “初始化”: 从“_Tp”转换到“int”，可能丢失数据
+          with
+          [
+              _Tp=float
+          ]
+E:\project\PCB-align\PCB-align\PCB-align.cpp(300,9): warning C4244: “初始化”: 从“_Tp”转换到“int”，可能丢失数据
+          with
+          [
+              _Tp=float
+          ]
+E:\project\PCB-align\PCB-align\PCB-align.cpp(301,9): warning C4244: “初始化”: 从“_Tp”转换到“int”，可能丢失数据
+          with
+          [
+              _Tp=float
+          ]
+E:\project\PCB-align\PCB-align\PCB-align.cpp(363,47): warning C4554: “&”: 检查运算符优先级是否存在的可能的错误；使用括号阐明优先级
+E:\project\PCB-align\PCB-align\PCB-align.cpp(364,40): warning C4554: “&”: 检查运算符优先级是否存在的可能的错误；使用括号阐明优先级
+E:\project\PCB-align\PCB-align\PCB-align.cpp(410,23): warning C4018: “<”: 有符号/无符号不匹配
+E:\project\PCB-align\PCB-align\PCB-align.cpp(422,9): warning C4554: “&”: 检查运算符优先级是否存在的可能的错误；使用括号阐明优先级
+E:\project\PCB-align\PCB-align\PCB-align.cpp(422,116): warning C4554: “&”: 检查运算符优先级是否存在的可能的错误；使用括号阐明优先级
+E:\project\PCB-align\PCB-align\PCB-align.cpp(425,25): warning C4018: “<”: 有符号/无符号不匹配
+E:\project\PCB-align\PCB-align\PCB-align.cpp(434,11): warning C4554: “&”: 检查运算符优先级是否存在的可能的错误；使用括号阐明优先级
+E:\project\PCB-align\PCB-align\PCB-align.cpp(434,104): warning C4554: “&”: 检查运算符优先级是否存在的可能的错误；使用括号阐明优先级
+E:\project\PCB-align\PCB-align\PCB-align.cpp(436,26): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
+E:\project\PCB-align\PCB-align\PCB-align.cpp(578,20): warning C4018: “<”: 有符号/无符号不匹配
+E:\project\PCB-align\PCB-align\PCB-align.cpp(594,39): warning C4244: “参数”: 从“int”转换到“_Tp”，可能丢失数据
+          with
+          [
+              _Tp=float
+          ]
+E:\project\PCB-align\PCB-align\PCB-align.cpp(594,36): warning C4244: “参数”: 从“int”转换到“_Tp”，可能丢失数据
+          with
+          [
+              _Tp=float
+          ]
+E:\project\PCB-align\PCB-align\PCB-align.cpp(599,20): warning C4018: “<”: 有符号/无符号不匹配
+E:\project\PCB-align\PCB-align\PCB-align.cpp(600,9): warning C4244: “初始化”: 从“_Tp”转换到“int”，可能丢失数据
+          with
+          [
+              _Tp=float
+          ]
+E:\project\PCB-align\PCB-align\PCB-align.cpp(601,9): warning C4244: “初始化”: 从“_Tp”转换到“int”，可能丢失数据
+          with
+          [
+              _Tp=float
+          ]
+E:\project\PCB-align\PCB-align\PCB-align.cpp(603,9): warning C4244: “初始化”: 从“_Tp”转换到“int”，可能丢失数据
+          with
+          [
+              _Tp=float
+          ]
+E:\project\PCB-align\PCB-align\PCB-align.cpp(604,9): warning C4244: “初始化”: 从“_Tp”转换到“int”，可能丢失数据
+          with
+          [
+              _Tp=float
+          ]
+  PCB-align.vcxproj -> E:\project\PCB-align\Debug\PCB-align.exe
