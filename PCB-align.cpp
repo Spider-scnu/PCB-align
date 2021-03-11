@@ -5,7 +5,7 @@
 #include <opencv2/opencv.hpp> 
 #include<opencv2/xfeatures2d.hpp>
 #include<opencv2/core/core.hpp>
-
+typedef unsigned char BYTE;
 using namespace cv;
 using namespace std;
 using namespace cv::xfeatures2d; //只有加上这句命名空间，SiftFeatureDetector and SiftFeatureExtractor 才可以使用
@@ -22,6 +22,133 @@ int font_face = cv::FONT_HERSHEY_COMPLEX;
 double font_scale = 1;
 int thickness = 2;
 int baseline;
+
+void TemplateMatch(Mat* pTo, Mat pTemplate_raw, Mat* src, Point2f* image1_matchingpoint, Point2f* image2_matchingpoint)
+{
+
+	//循环变量
+	int i, j, m, n;
+
+	double dSumT; //模板元素的平方和
+	double dSumS; //图像子区域元素的平方和
+	double dSumST; //图像子区域和模板的点积    
+
+				   //响应值
+	double R;
+
+	//记录当前的最大响应
+	double MaxR;
+
+	//最大响应出现位置
+	int image1_nMaxX;
+	int image1_nMaxY;
+	int image2_nMaxX;
+	int image2_nMaxY;
+
+	int nTplHeight_raw = pTemplate_raw.rows;
+	int nTplWidth_raw = pTemplate_raw.cols;
+	MaxR = 0;
+	for (int k = 2; k < 4; k++) {
+		int TplROI_w = nTplWidth_raw / k;
+		int x_range = nTplWidth_raw - TplROI_w;
+
+		for (int l = 2; l < 4; l++) {
+			int TplROI_h = nTplHeight_raw / l;
+			int y_range = nTplHeight_raw - TplROI_h;
+
+			int TplRand_X = rand()%x_range;
+			int TplRand_Y = rand()%y_range;
+
+			cout << "Rand-x : " << TplRand_X << "; Rand-y : " << TplRand_Y << endl;
+			
+			Mat pTemplate;
+
+			pTemplate_raw(Rect(TplRand_X, TplRand_Y, TplROI_w, TplROI_h)).copyTo(pTemplate);
+			int nHeight = src->rows;
+			int nWidth = src->cols;
+			//模板的高、宽
+			int nTplHeight = pTemplate.rows;
+			int nTplWidth = pTemplate.cols;
+
+			//计算 dSumT
+			dSumT = 0;
+			for (m = 0; m < nTplHeight; m++)
+			{
+				for (n = 0; n < nTplWidth; n++)
+				{
+					// 模板图像第m行，第n个象素的灰度值
+					int nGray = *pTemplate.ptr(m, n);
+
+					dSumT += (double)nGray * nGray;
+				}
+			}
+
+			//找到图像中最大响应的出现位置
+			cout << nHeight - nTplHeight << ", " << nWidth - nTplWidth << endl;
+			for (i = 0; i < nHeight - nTplHeight + 1; i++)
+			{
+				for (j = 0; j < nWidth - nTplWidth + 1; j++)
+				{
+					dSumST = 0;
+					dSumS = 0;
+
+					for (m = 0; m < nTplHeight; m++)
+					{
+						for (n = 0; n < nTplWidth; n++)
+						{
+							// 原图像第i+m行，第j+n列象素的灰度值
+							int nGraySrc = *src->ptr(i + m, j + n);
+
+							// 模板图像第m行，第n个象素的灰度值
+							int nGrayTpl = *pTemplate.ptr(m, n);
+
+							dSumS += (double)nGraySrc * nGraySrc;
+							dSumST += (double)nGraySrc * nGrayTpl;
+						}
+					}
+
+					R = dSumST / (sqrt(dSumS) * sqrt(dSumT));//计算相关响应
+
+					//与最大相似性比较
+					if (R > MaxR)
+					{
+						MaxR = R;
+						image1_nMaxX = j;
+						image1_nMaxY = i;
+						image2_nMaxX = TplRand_X;
+						image2_nMaxY = TplRand_Y;
+					}
+				}
+			}
+
+
+			cout << "nMaxX" << image1_nMaxX << ", " << image1_nMaxY << ", " << MaxR << endl;
+		}
+	}
+		
+	
+	
+
+	//将找到的最佳匹配区域复制到目标图像
+	/*for (m = 0; m < nTplHeight; m++)
+	{
+		for (n = 0; n < nTplWidth; n++)
+		{
+			int nGray = *src->ptr(nMaxY + m, nMaxX + n);
+			//pTo->setTo(nMaxX + n, nMaxY + m, RGB(nGray, nGray, nGray));
+			pTo->at<BYTE>(nMaxY + m, nMaxX + n) = nGray;
+		}
+	}*/
+
+
+	image1_matchingpoint->x = image1_nMaxX;
+	image1_matchingpoint->y = image1_nMaxY;
+	image2_matchingpoint->x = image2_nMaxX;
+	image2_matchingpoint->y = image2_nMaxY;
+	cout << "nMaxX" << image1_nMaxX << ", " << image1_nMaxY <<", "<<MaxR<< endl;
+}
+
+
 
 static double distance(Point pt0, Point pt1)
 {
@@ -339,6 +466,7 @@ int main(int argc, char** argv) {
 	//img.copyTo(temp);放在这里会出现拖影的现象，因为上一次画的矩形并没有被更新
 	//int num = 0;
 	int num_rect = 0;
+	bool grayAligned = true;
 	string rect_descri = "Rectangle";
 	mixed_image.copyTo(temp1);
 	vector<Point2f> image1Points_phase2, image2Points_phase2;
@@ -375,6 +503,43 @@ int main(int argc, char** argv) {
 				cvtColor(image_bothROI, image_bothROI_gray, COLOR_BGR2GRAY);
 
 				cout << box.x << ", " << box.y << endl;
+
+
+				////////////////
+				/// Step 3.0 灰度相关筛选
+				///
+				/// 
+				/// 
+				if ( grayAligned){
+					Mat image1ROI_aligned_draw, image2ROI_aligned_draw;
+
+					//threshold(image1ROI_gray, image1ROI_aligned_draw, 60, 255.0, CV_THRESH_BINARY);
+					//threshold(image_bothROI_gray, image2ROI_aligned_draw, 60, 255.0, CV_THRESH_BINARY);
+					image1ROI_gray.copyTo(image1ROI_aligned_draw);
+					image_bothROI_gray.copyTo(image2ROI_aligned_draw);
+					//image1ROI_aligned_draw = 255 - image1ROI_aligned_draw;
+					Mat pt = image1ROI_aligned_draw;
+					Point2f image1_matchingPoint, image2_matchingPoint;
+
+					pt.data = new BYTE[image1ROI_aligned_draw.cols * image1ROI_aligned_draw.rows];
+					memset(pt.data, 255, image1ROI_aligned_draw.cols * image1ROI_aligned_draw.rows);
+					TemplateMatch(&pt, image2ROI_aligned_draw, &image1ROI_aligned_draw, &image1_matchingPoint, &image2_matchingPoint);
+					//image1Points_phase2.push_back(image1_matchingPoint);
+					//image2Points_phase2.push_back(image2_matchingPoint);
+					image1Points_phase2.push_back(Point2f(image1_matchingPoint.x + box.x, image1_matchingPoint.y + box.y));
+					image2Points_phase2.push_back(Point2f(image2_matchingPoint.x + box.x, image2_matchingPoint.y + box.y));
+					circle(image1ROI_aligned_draw, Point(image1_matchingPoint.x, image1_matchingPoint.y), 2, Scalar(0, 0, 255), 2);
+					circle(image2ROI_aligned_draw, Point(image2_matchingPoint.x, image2_matchingPoint.y), 2, Scalar(0, 0, 255), 2);
+					Mat mixed_image_grayaligned;
+					addWeighted(image1ROI_aligned_draw, alpha, image2ROI_aligned_draw, (1 - alpha), 0.0, mixed_image_grayaligned);
+					imwrite("./gray/1.jpg", image1ROI_aligned_draw);
+					imwrite("./gray/2.jpg", image2ROI_aligned_draw);
+					imwrite("./gray/3.jpg", mixed_image_grayaligned);
+				}
+				
+
+
+				////////////
 
 				///////////////////////////////////////////////////
 				/// Step3.1 检测出矩形区域中所含多边形的轮廓，然后使用外接最小圆的方法，获得多边形的中心，最后
@@ -440,6 +605,7 @@ int main(int argc, char** argv) {
 								radius_ori = tmp_radius;
 
 							}
+							
 						}
 						if (max_similarity > ther_similarity) {
 							cout << tmp_gerber_point.x + box.x << ", " << tmp_gerber_point.y + box.y << endl;
@@ -587,6 +753,8 @@ int main(int argc, char** argv) {
 	m_homography_phase2 = findHomography(image1Points_phase2, image2Points_phase2, RANSAC, 3, m_phase2);
 
 
+
+
 	Mat image_both_phase2 = Mat::zeros(img_2.size(), CV_8UC3);
 	vector<Point2f> points_phase2, points_trans_phase2;
 	for (int i = 0; i < img_2.rows; i++) {
@@ -618,7 +786,14 @@ int main(int argc, char** argv) {
 	//Mat mixed_image;
 
 	addWeighted(img_1, alpha, image_both_phase2, (1 - alpha), 0.0, mixed_image);
-	imwrite("imgout_phase2_mixed.jpg", mixed_image);
+	if (grayAligned) {
+		imwrite("imgout_phase2_mixed_grayaligned.jpg", mixed_image);
+	}
+	else {
+		imwrite("imgout_phase2_mixed.jpg", mixed_image);
+	}
+	
+
 	imwrite("imgout_phase2_ori.jpg", image_both_phase2);
 
 
