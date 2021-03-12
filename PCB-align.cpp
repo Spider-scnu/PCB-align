@@ -467,6 +467,7 @@ int main(int argc, char** argv) {
 	//int num = 0;
 	int num_rect = 0;
 	bool grayAligned = true;
+	bool contourAligned = true;
 	string rect_descri = "Rectangle";
 	mixed_image.copyTo(temp1);
 	vector<Point2f> image1Points_phase2, image2Points_phase2;
@@ -528,108 +529,111 @@ int main(int argc, char** argv) {
 					//image2Points_phase2.push_back(image2_matchingPoint);
 					image1Points_phase2.push_back(Point2f(image1_matchingPoint.x + box.x, image1_matchingPoint.y + box.y));
 					image2Points_phase2.push_back(Point2f(image2_matchingPoint.x + box.x, image2_matchingPoint.y + box.y));
-					circle(image1ROI_aligned_draw, Point(image1_matchingPoint.x, image1_matchingPoint.y), 2, Scalar(0, 0, 255), 2);
-					circle(image2ROI_aligned_draw, Point(image2_matchingPoint.x, image2_matchingPoint.y), 2, Scalar(0, 0, 255), 2);
+					circle(image1ROI_aligned_draw, Point(image1_matchingPoint.x, image1_matchingPoint.y), 2, Scalar(0, 0, 0), 2);
+					circle(image2ROI_aligned_draw, Point(image2_matchingPoint.x, image2_matchingPoint.y), 2, Scalar(0, 0, 0), 2);
 					Mat mixed_image_grayaligned;
 					addWeighted(image1ROI_aligned_draw, alpha, image2ROI_aligned_draw, (1 - alpha), 0.0, mixed_image_grayaligned);
-					imwrite("./gray/1.jpg", image1ROI_aligned_draw);
-					imwrite("./gray/2.jpg", image2ROI_aligned_draw);
-					imwrite("./gray/3.jpg", mixed_image_grayaligned);
+					string grayAligned_name1 = "./gray/" + to_string(num_rect) + "_1.jpg";
+					string grayAligned_name2 = "./gray/" + to_string(num_rect) + "_2.jpg";
+					string grayAligned_name3 = "./gray/" + to_string(num_rect) + "_3.jpg";
+					imwrite(grayAligned_name1, image1ROI_aligned_draw);
+					imwrite(grayAligned_name2, image2ROI_aligned_draw);
+					imwrite(grayAligned_name3, mixed_image_grayaligned);
 				}
 				
 
 
 				////////////
 
-				///////////////////////////////////////////////////
+				if (contourAligned) {
+					///////////////////////////////////////////////////
 				/// Step3.1 检测出矩形区域中所含多边形的轮廓，然后使用外接最小圆的方法，获得多边形的中心，最后
 				///			根据最小圆的圆心进行匹配对齐。
-				blur(image1ROI_gray, image1ROI_gray, Size(3, 3));
-				blur(image_bothROI_gray, image_bothROI_gray, Size(3, 3));
-				int thresh = 100;
-				int max_thresh = 255;
-				RNG rng(12345);
+					blur(image1ROI_gray, image1ROI_gray, Size(3, 3));
+					blur(image_bothROI_gray, image_bothROI_gray, Size(3, 3));
+					int thresh = 100;
+					int max_thresh = 255;
+					RNG rng(12345);
 
-				Mat threshold_output_gerber, threshold_output_ori;
-				vector<vector<Point> > contours_gerber, contours_ori;
-				vector<Vec4i> hierarchy_gerber, hierarchy_ori;
+					Mat threshold_output_gerber, threshold_output_ori;
+					vector<vector<Point> > contours_gerber, contours_ori;
+					vector<Vec4i> hierarchy_gerber, hierarchy_ori;
 
-				/// 使用Threshold检测边缘
-				threshold(image1ROI_gray, threshold_output_gerber, thresh, 255, THRESH_BINARY);
-				threshold(image_bothROI_gray, threshold_output_ori, thresh, 255, THRESH_BINARY);
-				/// 找到轮廓
-				findContours(threshold_output_gerber, contours_gerber, hierarchy_gerber, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
-				findContours(threshold_output_ori, contours_ori, hierarchy_ori, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
+					/// 使用Threshold检测边缘
+					threshold(image1ROI_gray, threshold_output_gerber, thresh, 255, THRESH_BINARY);
+					threshold(image_bothROI_gray, threshold_output_ori, thresh, 255, THRESH_BINARY);
+					/// 找到轮廓
+					findContours(threshold_output_gerber, contours_gerber, hierarchy_gerber, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
+					findContours(threshold_output_ori, contours_ori, hierarchy_ori, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
 
-				vector<vector<Point> > contours_poly_gerber(contours_gerber.size()), contours_poly_ori(contours_ori.size());
-				vector<Rect> boundRect(contours_gerber.size());
-				//vector<Point2f>center_gerber, center_ori;
-				//vector<float>radius_gerber, radius_ori;
-				//vector<int> contours_index_gerber, contours_index_ori;
+					vector<vector<Point> > contours_poly_gerber(contours_gerber.size()), contours_poly_ori(contours_ori.size());
+					vector<Rect> boundRect(contours_gerber.size());
+					//vector<Point2f>center_gerber, center_ori;
+					//vector<float>radius_gerber, radius_ori;
+					//vector<int> contours_index_gerber, contours_index_ori;
 
-				Mat drawing_gerber =  Mat::zeros(threshold_output_gerber.size(), CV_8UC3);
-				Mat ROI1_colne = image1ROI_gray.clone();
-				Mat ROI2_colne = image_bothROI_gray.clone();
-				
+					Mat drawing_gerber = Mat::zeros(threshold_output_gerber.size(), CV_8UC3);
+					Mat ROI1_colne = image1ROI_gray.clone();
+					Mat ROI2_colne = image_bothROI_gray.clone();
 
-				for (int i = 0; i < contours_gerber.size(); i++) {
 
-					approxPolyDP(Mat(contours_gerber[i]), contours_poly_gerber[i], 3, true);
-					Rect tmp_rect_gerber = boundingRect(Mat(contours_poly_gerber[i]));
-					float max_similarity = 0.0;
-					
-					Point2f tmp_gerber_point;
-					float tmp_radius;
-					Point2f best_matching_point;
-					minEnclosingCircle(contours_poly_gerber[i], tmp_gerber_point, tmp_radius);
-					int index;
-					float radius_ori, ther_similarity = 1;
-					if (tmp_rect_gerber.size() != image1ROI_gray.size() & tmp_rect_gerber.width >= 3 & tmp_rect_gerber.height >= 3)
-					//if ( tmp_rect_gerber.width >= 3 & tmp_rect_gerber.height >= 3)
-					{
-						for (int j = 0; j < contours_ori.size(); j++) {
-							
-							approxPolyDP(Mat(contours_ori[j]), contours_poly_ori[j], 3, true);
-							Point2f tmp_ori_point;
-						
-							minEnclosingCircle(contours_poly_ori[j], tmp_ori_point, tmp_radius);
+					for (int i = 0; i < contours_gerber.size(); i++) {
 
-							double tmp_similarity = matchShapes(contours_gerber[i], contours_ori[j], CV_CONTOURS_MATCH_I1, 0);// +  distance(tmp_ori_point, tmp_gerber_point);
-							cout << "similarity = " << tmp_similarity << " in " << num_rect << endl;
-							if (tmp_similarity > max_similarity  & tmp_similarity < 10000 & tmp_similarity > ther_similarity) {
-								
-								max_similarity = tmp_similarity;
-								best_matching_point = tmp_ori_point;
+						approxPolyDP(Mat(contours_gerber[i]), contours_poly_gerber[i], 3, true);
+						Rect tmp_rect_gerber = boundingRect(Mat(contours_poly_gerber[i]));
+						float max_similarity = 0.0;
 
-								index = j;
-								radius_ori = tmp_radius;
+						Point2f tmp_gerber_point;
+						float tmp_radius;
+						Point2f best_matching_point;
+						minEnclosingCircle(contours_poly_gerber[i], tmp_gerber_point, tmp_radius);
+						int index;
+						float radius_ori, ther_similarity = 1;
+						if (tmp_rect_gerber.size() != image1ROI_gray.size() & tmp_rect_gerber.width >= 3 & tmp_rect_gerber.height >= 3)
+							//if ( tmp_rect_gerber.width >= 3 & tmp_rect_gerber.height >= 3)
+						{
+							for (int j = 0; j < contours_ori.size(); j++) {
+
+								approxPolyDP(Mat(contours_ori[j]), contours_poly_ori[j], 3, true);
+								Point2f tmp_ori_point;
+
+								minEnclosingCircle(contours_poly_ori[j], tmp_ori_point, tmp_radius);
+
+								double tmp_similarity = matchShapes(contours_gerber[i], contours_ori[j], CV_CONTOURS_MATCH_I1, 0);// +  distance(tmp_ori_point, tmp_gerber_point);
+								cout << "similarity = " << tmp_similarity << " in " << num_rect << endl;
+								if (tmp_similarity > max_similarity & tmp_similarity < 10000 & tmp_similarity > ther_similarity) {
+
+									max_similarity = tmp_similarity;
+									best_matching_point = tmp_ori_point;
+
+									index = j;
+									radius_ori = tmp_radius;
+
+								}
 
 							}
-							
-						}
-						if (max_similarity > ther_similarity) {
-							cout << tmp_gerber_point.x + box.x << ", " << tmp_gerber_point.y + box.y << endl;
-							image1Points_phase2.push_back(Point2f(tmp_gerber_point.x + box.x, tmp_gerber_point.y + box.y));
-							image2Points_phase2.push_back(Point2f(best_matching_point.x + box.x, best_matching_point.y + box.y));
-							Scalar color = Scalar(rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255));
-							drawContours(ROI1_colne, contours_poly_gerber, i, color, 1, 8, vector<Vec4i>(), 0, Point());
-							drawContours(ROI2_colne, contours_poly_ori, index, color, 1, 8, vector<Vec4i>(), 0, Point());
-							circle(ROI1_colne, tmp_gerber_point, (int)tmp_radius, color, 2, 8, 0);
-							circle(ROI2_colne, best_matching_point, (int)radius_ori, color, 2, 8, 0);
+							if (max_similarity > ther_similarity) {
+								cout << tmp_gerber_point.x + box.x << ", " << tmp_gerber_point.y + box.y << endl;
+								image1Points_phase2.push_back(Point2f(tmp_gerber_point.x + box.x, tmp_gerber_point.y + box.y));
+								image2Points_phase2.push_back(Point2f(best_matching_point.x + box.x, best_matching_point.y + box.y));
+								Scalar color = Scalar(rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255));
+								drawContours(ROI1_colne, contours_poly_gerber, i, color, 1, 8, vector<Vec4i>(), 0, Point());
+								drawContours(ROI2_colne, contours_poly_ori, index, color, 1, 8, vector<Vec4i>(), 0, Point());
+								circle(ROI1_colne, tmp_gerber_point, (int)tmp_radius, color, 2, 8, 0);
+								circle(ROI2_colne, best_matching_point, (int)radius_ori, color, 2, 8, 0);
 
+
+							}
 
 						}
 
 					}
+					string imageROI1_Contours = "./contours/ROI1_Contours_in_rect_" + to_string(num_rect) + ".jpg";
+					string imageROI2_Contours = "./contours/ROI2_Contours_in_rect_" + to_string(num_rect) + ".jpg";
+					imwrite(imageROI1_Contours, ROI1_colne);
+					imwrite(imageROI2_Contours, ROI2_colne);
 
 				}
-				string imageROI1_Contours = "./contours/ROI1_Contours_in_rect_" + to_string(num_rect) + ".jpg";
-				string imageROI2_Contours = "./contours/ROI2_Contours_in_rect_" + to_string(num_rect) + ".jpg";
-				imwrite(imageROI1_Contours, ROI1_colne);
-				imwrite(imageROI2_Contours, ROI2_colne);
-
-
-				
 				
 				
 				/// ////////////////////////////////////////////////////
