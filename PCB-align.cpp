@@ -40,26 +40,27 @@ void TemplateMatch(Mat* pTo, Mat pTemplate_raw, Mat* src, Point2f* image1_matchi
 	double MaxR;
 
 	//最大响应出现位置
-	int image1_nMaxX;
-	int image1_nMaxY;
-	int image2_nMaxX;
-	int image2_nMaxY;
+	int image1_nMaxX=0;
+	int image1_nMaxY=0;
+	int image2_nMaxX=0;
+	int image2_nMaxY=0;
 
 	int nTplHeight_raw = pTemplate_raw.rows;
 	int nTplWidth_raw = pTemplate_raw.cols;
 	MaxR = 0;
-	for (int k = 2; k < 4; k++) {
-		int TplROI_w = nTplWidth_raw / k;
-		int x_range = nTplWidth_raw - TplROI_w;
+	double ratio[6] = {0.8, 0.7, 0.6, 0.5, 0.4, 0.3 };
+	for (int k = 0; k < 6; k++) {
+		int TplROI_w = nTplWidth_raw * ratio[k];
+		//int x_range = nTplWidth_raw - TplROI_w;
 
-		for (int l = 2; l < 4; l++) {
-			int TplROI_h = nTplHeight_raw / l;
-			int y_range = nTplHeight_raw - TplROI_h;
+		for (int l = 0; l < 6; l++) {
+			int TplROI_h = nTplHeight_raw * ratio[l];
+			//int y_range = nTplHeight_raw - TplROI_h;
 
-			int TplRand_X = rand()%x_range;
-			int TplRand_Y = rand()%y_range;
+			int TplRand_X = (nTplWidth_raw - TplROI_w)/2 - 1;//rand()%x_range;
+			int TplRand_Y = (nTplHeight_raw - TplROI_h)/2 - 1;//rand()%y_range;
 
-			cout << "Rand-x : " << TplRand_X << "; Rand-y : " << TplRand_Y << endl;
+			//cout << "Rand-x : " << TplRand_X << "; Rand-y : " << TplRand_Y << endl;
 			
 			Mat pTemplate;
 
@@ -84,7 +85,7 @@ void TemplateMatch(Mat* pTo, Mat pTemplate_raw, Mat* src, Point2f* image1_matchi
 			}
 
 			//找到图像中最大响应的出现位置
-			cout << nHeight - nTplHeight << ", " << nWidth - nTplWidth << endl;
+			//cout << nHeight - nTplHeight << ", " << nWidth - nTplWidth << endl;
 			for (i = 0; i < nHeight - nTplHeight + 1; i++)
 			{
 				for (j = 0; j < nWidth - nTplWidth + 1; j++)
@@ -122,7 +123,7 @@ void TemplateMatch(Mat* pTo, Mat pTemplate_raw, Mat* src, Point2f* image1_matchi
 			}
 
 
-			cout << "nMaxX" << image1_nMaxX << ", " << image1_nMaxY << ", " << MaxR << endl;
+			//cout << "nMaxX" << image1_nMaxX << ", " << image1_nMaxY << ", " << MaxR << endl;
 		}
 	}
 		
@@ -140,12 +141,12 @@ void TemplateMatch(Mat* pTo, Mat pTemplate_raw, Mat* src, Point2f* image1_matchi
 		}
 	}*/
 
-
+	cout << image1_nMaxX << endl;
 	image1_matchingpoint->x = image1_nMaxX;
 	image1_matchingpoint->y = image1_nMaxY;
 	image2_matchingpoint->x = image2_nMaxX;
 	image2_matchingpoint->y = image2_nMaxY;
-	cout << "nMaxX" << image1_nMaxX << ", " << image1_nMaxY <<", "<<MaxR<< endl;
+	//cout << "nMaxX" << image1_nMaxX << ", " << image1_nMaxY <<", "<<MaxR<< endl;
 }
 
 
@@ -284,19 +285,42 @@ int main(int argc, char** argv) {
 	Mat img_3 = imread("test_data/IMG_20201211_144430.jpg");*/
 
 
-	Mat img_1 = imread("camera_real_test_20210130/gerber-20210222.png");
-	//Mat img_1 = imread("camera_real_test_20210130/sample.jpg", 0);
-
-	//Mat img_2 = imread("camera_real_test_20210130/ori-resize.jpg", 0);
+	/*Mat img_1 = imread("camera_real_test_20210130/gerber-20210222.png");
 	Mat img_2 = imread("camera_real_test_20210130/ori-resize-20210222.jpg");
-	//Mat img_3 = imread("camera_real_test_20210130/ori-resize.jpg");
+	Mat img_3 = imread("camera_real_test_20210130/ori-resize-20210222.jpg");*/
 
-	//Mat img_2 = imread("camera_real_test_20210130/results.jpg", 0);
-	Mat img_3 = imread("camera_real_test_20210130/ori-resize-20210222.jpg");
+
+	/*Mat img_1 = imread("testData/scan.jpg");
+	Mat img_2 = imread("testData/gerber.jpg");
+	Mat img_3 = imread("testData/gerber.jpg");*/
+
+	/*Mat img_1 = imread("testData/gerber.jpg");
+	Mat img_2 = imread("testData/scan_reshape.jpg");
+	Mat img_3 = imread("testData/scan_reshape.jpg");*/
+
+	/*Mat img_1 = imread("testData/gerber.jpg");
+	Mat img_2 = imread("testData/scan.jpg");
+	Mat img_3 = imread("testData/scan.jpg");*/
+
+	Mat img_1 = imread("testData/camera_test_11/imageScan.png");
+	Mat img_2 = imread("testData/camera_test_11/artificial.png");
+	Mat img_3 = imread("testData/camera_test_11/artificial.png");
+
+	/*unsigned int img_1_w = img_1.size().width;
+	unsigned int img_1_h = img_1.size().height;
+	unsigned int img_2_w = img_2.size().width;
+	unsigned int img_2_h = img_2.size().height;*/
+
+	//float ratio_w = img_1_w / img_2_w;
+	//float ratio_w = img_1_h / img_2_h;
+
+
+
 
 	imwrite("gray.jpg", img_2);
-	cv::resize(img_2, img_2, Size(img_1.cols, img_1.rows));
-	cv::resize(img_3, img_3, Size(img_1.cols, img_1.rows));
+	//cv::resize(img_2, img_2, Size(img_1.cols, img_1.rows));
+	//cv::resize(img_3, img_3, Size(img_1.cols, img_1.rows));
+	//imwrite("testData/scan_reshape.jpg", img_3);
 	Mat temp, temp1;
 	bool aritificial = false;
 	vector<Point2f> image1Points, image2Points;
@@ -370,7 +394,7 @@ int main(int argc, char** argv) {
 	}
 	else {
 		/*int PredefinedKeypoints_num = 12;
-		
+
 		int IMG1_PredefinedKeypoints[12][2] = { {172,109},{462,111},{464,1013},{594,1013},{891,1013},{1028,1018},
 		{1102,331},{1241,331},{1526,1233},{1964,1238},{1840,241},{2249,239} };
 
@@ -378,17 +402,15 @@ int main(int argc, char** argv) {
 		{1117,324},{1257,331},{1526,1132},{1943,1132},{1827,248},{2226,250} };*/
 		int PredefinedKeypoints_num = 4;
 
-		//int IMG1_PredefinedKeypoints[4][2] = { {140,91},{332,1256}, {2229,89}, {2422,1254} };
 
-		//int IMG2_PredefinedKeypoints[4][2] = { {200,112},{374,1150},{2211,120},{2387,1155}};
+		//int IMG1_PredefinedKeypoints[4][2] = { {148,62},{2241,57}, {2424,1235}, {335,1217} };
 
-		//int IMG1_PredefinedKeypoints[4][2] = { {137,86},{328,1259}, {2233,86}, {2426,1261} };
+		//int IMG2_PredefinedKeypoints[4][2] = { {52,23},{802,22},{867,477},{119,470}};// { {57, 22}, { 866,20 }, { 937,442 }, { 129,435 }};
+		//int IMG1_PredefinedKeypoints[4][2] = { {70,42},{791,45},{856,441},{137,433} };
 
-		//int IMG2_PredefinedKeypoints[4][2] = { {198,109},{372,1153},{2202,126},{2381,1152} };
 
-		int IMG1_PredefinedKeypoints[4][2] = { {137,85},{336,1251}, {2373,42}, {2424,1264} };
-
-		int IMG2_PredefinedKeypoints[4][2] = { {204,119},{372,1153},{2336,91},{2379,1149} };
+		int IMG1_PredefinedKeypoints[4][2] = { {301,221},{875,214},{404,2358},{978,2348} };
+		int IMG2_PredefinedKeypoints[4][2] = { {551,170},{1142,163},{ 665, 2373},{1253,2380} };
 
 		for (int i = 0; i < PredefinedKeypoints_num; i++) {
 			Point2f p_img1(IMG1_PredefinedKeypoints[i][0], IMG1_PredefinedKeypoints[i][1]);
@@ -399,19 +421,23 @@ int main(int argc, char** argv) {
 
 		}
 	}
-	
+
 
 	//求转换矩阵
 	Mat m_homography;
 	vector<uchar> m;
+	cout << "step 1 " << endl;
 	m_homography = findHomography(image1Points, image2Points, RANSAC, 3, m);//寻找匹配图像
+
+	cout << "step 1 finished " << endl;
 
 
 	//等待任意按键按下
 	//imwrite("match_img.jpg", img_RR_matches);
 
-
-	Mat image_both = Mat::zeros(img_2.size(), CV_8UC3);
+	Mat image_both;
+	warpPerspective(img_2, image_both, m_homography, img_1.size());
+	/*Mat image_both = Mat::zeros(img_2.size(), CV_8UC3);
 	vector<Point2f> points, points_trans;
 	for (int i = 0; i < img_2.rows; i++) {
 		for (int j = 0; j < img_2.cols; j++) {
@@ -423,7 +449,7 @@ int main(int argc, char** argv) {
 	for (int i = 0; i < points.size(); i++) {
 		int x = points_trans[i].x;
 		int y = points_trans[i].y;
-
+		//cout << x <<", "<< y << endl;
 		int u = points[i].x;
 		int v = points[i].y;
 
@@ -438,23 +464,28 @@ int main(int argc, char** argv) {
 			image_both.at<Vec3b>(v, u)[0] = (img_3.at<Vec3b>(y, x)[0]);
 
 		}
-	}
+	}*/
 
+
+	cout << "Ending" << endl;
 	//imwrite("imgout_phase1.jpg", image_both);
 
 	///////////////////////////////////////////////////////////
 	//
 	// 图像混合
 	//
-	double alpha = 0.9;
+	double alpha = 0.3;
 	Mat mixed_image;
+	//cv::resize(image_both, image_both, Size(img_1.cols, img_1.rows));
 	addWeighted(img_1, alpha, image_both, (1 - alpha), 0.0, mixed_image);
+	//imwrite("image_both.jpg", image_both);
 	imwrite("imgout_phase1.jpg", mixed_image);
 	//namedWindow("mixed_image", 0);
 	//imshow("mixed_image", mixed_image);
+	//imwrite("imgout_phase1.jpg", image_both);
 
 
-
+	cout << "Ending2" << endl;
 	/////////////////////////////////////////////////////////
 
 
@@ -470,6 +501,33 @@ int main(int argc, char** argv) {
 	bool contourAligned = true;
 	string rect_descri = "Rectangle";
 	mixed_image.copyTo(temp1);
+
+
+	/// <summary>
+	/// / 使用预先定义好的矩形
+	/// </summary>
+	vector<Rect> rects;
+	aritificial = true;
+	//rects.push_back(Rect(1231, 2357, 56, 51));
+	rects.push_back(Rect(647, 2349, 55, 55));
+	rects.push_back(Rect(767, 329, 55, 76));
+	rects.push_back(Rect(1116, 143, 61, 61));
+	rects.push_back(Rect(1007, 2156, 61, 61));
+	rects.push_back(Rect(287, 2407, 55, 75));
+	rects.push_back(Rect(1497, 2219, 55, 75));
+	//两旁
+	rects.push_back(Rect(285, 705, 40, 57));
+	rects.push_back(Rect(285, 1598, 41, 63));
+	rects.push_back(Rect(285, 2036, 46, 70));
+
+	rects.push_back(Rect(1496, 501, 43, 70));
+	rects.push_back(Rect(1496, 958, 45, 65));
+	rects.push_back(Rect(1496, 1407, 41, 60));
+	
+	//rects.push_back(Rect(523, 143, 77, 51));
+	int rect_index  = 0;
+	int max_rect = 12;
+	float radius_ori, ther_similarity = 1.0;
 	vector<Point2f> image1Points_phase2, image2Points_phase2;
 	while (1)
 	{
@@ -477,21 +535,32 @@ int main(int argc, char** argv) {
 		//只要不再次按下鼠标左键触发事件,则程序显示的一直是if条件里面被矩形函数处理过的temp图像，如果再次按下鼠标左键就进入if，不断更新被画矩形函数处理过的temp，因为处理速度快所以看起来画矩形的过程是连续的没有卡顿，因为每次重新画都是在没有框的基础上画出新的框因为人眼的残影延迟所以不会有拖影现象。每次更新矩形框的传入数据是重新被img（没有框）的数据覆盖的temp（即img.data==temp.data）和通过回调函数更新了的Box记录的坐标点数据。
 		//依照上面所述，则当画完一个矩形后，如果在单击一下鼠标左键(没有拖动),则drawing_box==true,因为Box记录到的坐标点数据计算出来的长宽为0（因为未进行拖动,box.width,box.height为0，则画矩形函数rectangle（）所传入第二第三个参数即对角点的参数两个是相等的，所以矩形的对角线是0就无法画出矩形），则显示的是没有框的原图，此时显示的temp的数据应是和img相等的
 		mixed_image.copyTo(temp);
-		if (drawing_box) {//不断更新正在画的矩形
-			//这句放在这里是保证了每次更新矩形框都是在没有原图的基础上更新矩形框。
-			rectangle(temp, Point(box.x, box.y), Point(box.x + box.width, box.y + box.height), Scalar(255, 255, 255));
-			imshow("Step 2. 选取需要重新匹配的矩形区域，至少选择三个不同的区域，最多选择六个不同的区域。选择完成后，按esc推出界面。", temp);//显示
-			
-			int x = box.x;
-			int y = box.y;
-			//num++;
-			//cout << " num = " << num << ", (" << x << "," << y << ")" << endl;
+		if (aritificial) {
+			box.x = rects[rect_index].x;
+			box.y = rects[rect_index].y;
+			box.width = rects[rect_index].width;
+			box.height = rects[rect_index].height;
 		}
+		else {
+			if (drawing_box) {//不断更新正在画的矩形
+			//这句放在这里是保证了每次更新矩形框都是在没有原图的基础上更新矩形框。
+				rectangle(temp, Point(box.x, box.y), Point(box.x + box.width, box.y + box.height), Scalar(255, 255, 255));
+				imshow("Step 2. 选取需要重新匹配的矩形区域，至少选择三个不同的区域，最多选择六个不同的区域。选择完成后，按esc推出界面。", temp);//显示
+
+				int x = box.x;
+				int y = box.y;
+				
+				//num++;
+				//cout << " num = " << num << ", (" << x << "," << y << ")" << endl;
+			}
+		}
+
 		//vector<Point2f> p01, p02;
-		
-		if (end_drawing == true & movemouse == false) {
+
+		if ((end_drawing == true & movemouse == false) || aritificial == true) {
 			if (box.width >= 2 & box.height >= 2) {
 				Mat image1ROI = img_1(Rect(box.x, box.y, box.width, box.height));
+				cout << Rect(box.x, box.y, box.width, box.height) << endl;
 				Mat image_bothROI = image_both(Rect(box.x, box.y, box.width, box.height));
 				Mat dst1, dst2;
 				image1ROI.convertTo(dst1, dst1.type());
@@ -500,18 +569,18 @@ int main(int argc, char** argv) {
 				imwrite("./ROI2.jpg", image_bothROI);
 				Mat image1ROI_gray, image_bothROI_gray;
 				cvtColor(image1ROI, image1ROI_gray, COLOR_BGR2GRAY);
-				image1ROI_gray = 255 - image1ROI_gray;
+				//image1ROI_gray = 255 - image1ROI_gray;
 				cvtColor(image_bothROI, image_bothROI_gray, COLOR_BGR2GRAY);
 
-				cout << box.x << ", " << box.y << endl;
+				//cout << box.x << ", " << box.y << endl;
 
-
+				cout << "Begining : " << image1Points_phase2.size() << ", " << image2Points_phase2.size() << endl;
 				////////////////
 				/// Step 3.0 灰度相关筛选
 				///
 				/// 
 				/// 
-				if ( grayAligned){
+				if (grayAligned) {
 					Mat image1ROI_aligned_draw, image2ROI_aligned_draw;
 
 					//threshold(image1ROI_gray, image1ROI_aligned_draw, 60, 255.0, CV_THRESH_BINARY);
@@ -527,8 +596,9 @@ int main(int argc, char** argv) {
 					TemplateMatch(&pt, image2ROI_aligned_draw, &image1ROI_aligned_draw, &image1_matchingPoint, &image2_matchingPoint);
 					//image1Points_phase2.push_back(image1_matchingPoint);
 					//image2Points_phase2.push_back(image2_matchingPoint);
-					image1Points_phase2.push_back(Point2f(image1_matchingPoint.x + box.x, image1_matchingPoint.y + box.y));
-					image2Points_phase2.push_back(Point2f(image2_matchingPoint.x + box.x, image2_matchingPoint.y + box.y));
+					cout << image1_matchingPoint.x << ", " << image1_matchingPoint.y <<" , index = "<<rect_index<< endl;
+					image2Points_phase2.push_back(Point2f(image1_matchingPoint.x + box.x, image1_matchingPoint.y + box.y));
+					image1Points_phase2.push_back(Point2f(image2_matchingPoint.x + box.x, image2_matchingPoint.y + box.y));
 					circle(image1ROI_aligned_draw, Point(image1_matchingPoint.x, image1_matchingPoint.y), 2, Scalar(0, 0, 0), 2);
 					circle(image2ROI_aligned_draw, Point(image2_matchingPoint.x, image2_matchingPoint.y), 2, Scalar(0, 0, 0), 2);
 					Mat mixed_image_grayaligned;
@@ -540,7 +610,7 @@ int main(int argc, char** argv) {
 					imwrite(grayAligned_name2, image2ROI_aligned_draw);
 					imwrite(grayAligned_name3, mixed_image_grayaligned);
 				}
-				
+				cout << "After grayAligned : " << image1Points_phase2.size() << ", " << image2Points_phase2.size() << endl;
 
 
 				////////////
@@ -551,7 +621,7 @@ int main(int argc, char** argv) {
 				///			根据最小圆的圆心进行匹配对齐。
 					blur(image1ROI_gray, image1ROI_gray, Size(3, 3));
 					blur(image_bothROI_gray, image_bothROI_gray, Size(3, 3));
-					int thresh = 100;
+					int thresh = 0;
 					int max_thresh = 255;
 					RNG rng(12345);
 
@@ -559,12 +629,25 @@ int main(int argc, char** argv) {
 					vector<vector<Point> > contours_gerber, contours_ori;
 					vector<Vec4i> hierarchy_gerber, hierarchy_ori;
 
+					//GaussianBlur(image1ROI_gray, threshold_output_gerber, Size(3, 3), 0, 0);
+					//GaussianBlur(image_bothROI_gray, threshold_output_ori, Size(3, 3), 0, 0);
+					//blur(image1ROI_gray, threshold_output_gerber, Size(3, 3));
+					//blur(image_bothROI_gray, threshold_output_ori, Size(3, 3));
+					image1ROI_gray.copyTo(threshold_output_gerber);
+					image_bothROI_gray.copyTo(threshold_output_ori);
+					//cvtColor(src, src, COLOR_BGR2GRAY);
+					Canny(threshold_output_gerber, threshold_output_gerber, 20, 80, 3, false);
+					Canny(threshold_output_ori, threshold_output_ori, 20, 80, 3, false);
+
 					/// 使用Threshold检测边缘
-					threshold(image1ROI_gray, threshold_output_gerber, thresh, 255, THRESH_BINARY);
-					threshold(image_bothROI_gray, threshold_output_ori, thresh, 255, THRESH_BINARY);
+					//threshold(image1ROI_gray, threshold_output_gerber, thresh, 255, THRESH_BINARY);
+					//threshold(image_bothROI_gray, threshold_output_ori, thresh, 255, THRESH_BINARY);
 					/// 找到轮廓
 					findContours(threshold_output_gerber, contours_gerber, hierarchy_gerber, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
 					findContours(threshold_output_ori, contours_ori, hierarchy_ori, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
+
+					//findContours(image1ROI_gray, contours_gerber, hierarchy_gerber, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
+					//findContours(image_bothROI_gray, contours_ori, hierarchy_ori, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
 
 					vector<vector<Point> > contours_poly_gerber(contours_gerber.size()), contours_poly_ori(contours_ori.size());
 					vector<Rect> boundRect(contours_gerber.size());
@@ -576,8 +659,74 @@ int main(int argc, char** argv) {
 					Mat ROI1_colne = image1ROI_gray.clone();
 					Mat ROI2_colne = image_bothROI_gray.clone();
 
-
+					float max_similarity = 0.0; 
+					Point2f best_matching_point1;
+					Point2f best_matching_point2;
+					
+					int index;
 					for (int i = 0; i < contours_gerber.size(); i++) {
+
+						approxPolyDP(Mat(contours_gerber[i]), contours_poly_gerber[i], 3, true);
+						Rect tmp_rect_gerber = boundingRect(Mat(contours_poly_gerber[i]));
+						
+
+						Point2f tmp_gerber_point;
+						float tmp_radius;
+						
+						minEnclosingCircle(contours_poly_gerber[i], tmp_gerber_point, tmp_radius);
+						
+						
+						if (tmp_rect_gerber.size() != image1ROI_gray.size() & tmp_rect_gerber.width >= 1 & tmp_rect_gerber.height >= 1)
+							//if ( tmp_rect_gerber.width >= 3 & tmp_rect_gerber.height >= 3)
+						{
+							for (int j = 0; j < contours_ori.size(); j++) {
+
+								approxPolyDP(Mat(contours_ori[j]), contours_poly_ori[j], 3, true);
+								Point2f tmp_ori_point;
+
+								minEnclosingCircle(contours_poly_ori[j], tmp_ori_point, tmp_radius);
+
+								double tmp_similarity = matchShapes(contours_gerber[i], contours_ori[j], CV_CONTOURS_MATCH_I1, 0);// +  distance(tmp_ori_point, tmp_gerber_point);
+								//cout << "similarity = " << tmp_similarity << " in " << num_rect << endl;
+								if (tmp_similarity > max_similarity & tmp_similarity < 10000 & tmp_similarity > ther_similarity) {
+
+									max_similarity = tmp_similarity;
+									best_matching_point1 = tmp_gerber_point;
+									best_matching_point2 = tmp_ori_point;
+
+									index = j;
+									radius_ori = tmp_radius;
+
+								}
+
+							}
+							
+
+						}
+
+					}
+					if (max_similarity > ther_similarity) {
+						//cout << best_matching_point1.x + box.x << ", " << tmp_gerber_point.y + box.y << endl;
+						image1Points_phase2.push_back(Point2f(best_matching_point1.x + box.x, best_matching_point1.y + box.y));
+						image2Points_phase2.push_back(Point2f(best_matching_point2.x + box.x, best_matching_point2.y + box.y));
+						Scalar color = Scalar(rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255));
+						//drawContours(ROI1_colne, contours_poly_gerber, i, color, 1, 8, vector<Vec4i>(), 0, Point());
+						drawContours(ROI2_colne, contours_poly_ori, index, color, 1, 8, vector<Vec4i>(), 0, Point());
+						//circle(ROI1_colne, tmp_gerber_point, (int)tmp_radius, color, 2, 8, 0);
+						circle(ROI2_colne, best_matching_point2, (int)radius_ori, color, 2, 8, 0);
+
+
+					}
+					string imageROI1_Contours = "./contours/ROI1_Contours_in_rect_" + to_string(num_rect) + ".jpg";
+					string imageROI2_Contours = "./contours/ROI2_Contours_in_rect_" + to_string(num_rect) + ".jpg";
+					imwrite(imageROI1_Contours, ROI1_colne);
+					imwrite(imageROI2_Contours, ROI2_colne);
+
+				}
+				cout << "After contours : " << image1Points_phase2.size() << ", " << image2Points_phase2.size() << endl;
+
+					//cout << "Contours-size = " << contours_gerber.size() << endl;
+					/*for (int i = 0; i < contours_gerber.size(); i++) {
 
 						approxPolyDP(Mat(contours_gerber[i]), contours_poly_gerber[i], 3, true);
 						Rect tmp_rect_gerber = boundingRect(Mat(contours_poly_gerber[i]));
@@ -589,7 +738,7 @@ int main(int argc, char** argv) {
 						minEnclosingCircle(contours_poly_gerber[i], tmp_gerber_point, tmp_radius);
 						int index;
 						float radius_ori, ther_similarity = 1;
-						if (tmp_rect_gerber.size() != image1ROI_gray.size() & tmp_rect_gerber.width >= 3 & tmp_rect_gerber.height >= 3)
+						if (tmp_rect_gerber.size() != image1ROI_gray.size() & tmp_rect_gerber.width >= 1 & tmp_rect_gerber.height >= 1)
 							//if ( tmp_rect_gerber.width >= 3 & tmp_rect_gerber.height >= 3)
 						{
 							for (int j = 0; j < contours_ori.size(); j++) {
@@ -600,7 +749,7 @@ int main(int argc, char** argv) {
 								minEnclosingCircle(contours_poly_ori[j], tmp_ori_point, tmp_radius);
 
 								double tmp_similarity = matchShapes(contours_gerber[i], contours_ori[j], CV_CONTOURS_MATCH_I1, 0);// +  distance(tmp_ori_point, tmp_gerber_point);
-								cout << "similarity = " << tmp_similarity << " in " << num_rect << endl;
+								//cout << "similarity = " << tmp_similarity << " in " << num_rect << endl;
 								if (tmp_similarity > max_similarity & tmp_similarity < 10000 & tmp_similarity > ther_similarity) {
 
 									max_similarity = tmp_similarity;
@@ -629,22 +778,23 @@ int main(int argc, char** argv) {
 
 					}
 					string imageROI1_Contours = "./contours/ROI1_Contours_in_rect_" + to_string(num_rect) + ".jpg";
-					string imageROI2_Contours = "./contours/ROI2_Contours_in_rect_" + to_string(num_rect) + ".jpg";
+					string imageROI2_Contours = "./contours/ROI2_C.
+					ontours_in_rect_" + to_string(num_rect) + ".jpg";
 					imwrite(imageROI1_Contours, ROI1_colne);
 					imwrite(imageROI2_Contours, ROI2_colne);
 
-				}
-				
-				
+				}*/
+
+
 				/// ////////////////////////////////////////////////////
-				
+
 				/// <param name="argc"></param>
 				/// <param name="argv"></param>
 				/// <returns></returns>
 				/*
 				int minHessian = 40;
 				Ptr<Feature2D> f2d = xfeatures2d::SURF::create(minHessian);
-				
+
 				vector<KeyPoint> keypoints_1, keypoints_2;
 				f2d->detect(image1ROI_gray, keypoints_1);
 				f2d->detect(image_bothROI_gray, keypoints_2);
@@ -662,14 +812,14 @@ int main(int argc, char** argv) {
 				if (goodMatches.size() < 1) {
 					goodMatches = matches;
 				}
-				
+
 				Mat first_match;
 				drawMatches(image1ROI_gray, keypoints_1, image_bothROI_gray, keypoints_2, goodMatches, first_match);
 				string mathch_name = "matches_" + to_string(num_rect) + ".jpg";
 
 				imwrite(mathch_name, first_match);
 				cout << "size = " << keypoints_1.size() << ", " << keypoints_2.size()<<endl;
-				
+
 				if (goodMatches.size()>=1) {
 					vector<DMatch> m_Matches;
 					m_Matches = goodMatches;
@@ -692,7 +842,7 @@ int main(int argc, char** argv) {
 
 					}
 
-					
+
 					for (size_t i = 0; i < m_Matches.size(); i++)
 					{
 						//double minRelativeDistance = 10000.0;
@@ -708,7 +858,7 @@ int main(int argc, char** argv) {
 				putText(temp1, text, Point(box.x - 20, box.y - 10), font_face, font_scale, cv::Scalar(0, 0, 255), thickness, 4, 0);
 				num_rect++;
 
-				
+
 
 
 			}
@@ -716,49 +866,45 @@ int main(int argc, char** argv) {
 			end_drawing = false;
 			movemouse = true;
 		}
+		if (aritificial) {
+			rect_index++;
+		}
 		
-		if (waitKey(30) == 27 || num_rect>=15) {//检测是否有按下退出键
+		if (waitKey(30) == 27 || num_rect >= 15 || rect_index > max_rect - 1) {//检测是否有按下退出键
+			imwrite("phase2_选取的矩形区域.jpg", temp1);
 			break;//退出程序
 		}
 	}
 	
 	imwrite("rect_第二阶段.jpg", temp1);
-	////////////////////////////////////////////////////////////////
-	//
-	// Phase 2
-	//
-	///////////////////////////////////////////////////////////////
-	/*vector<Point2f> image1Points_phase2, image2Points_phase2;
-	int IMG1_PredefinedKeypoints_phase2[12][2] = { {109,48},{141,88},{435,555},{401,791},{190,1296},
-	{2370,44},{2235,88},{2348,326},{2128,784},{2348,903},{2419,1251},{2446,1296} };
 
-	int IMG2_PredefinedKeypoints_phase2[12][2] = { {121,53},{152,93},{444,564},{413,796},{215,1301},
-	{2399,30},{2251,75},{2374,317},{2141,789},{2361,915},{2433,1269},{2460,1312} };
 
-	for (int i = 0; i < PredefinedKeypoints_num; i++) {
-		Point2f p_img1(IMG1_PredefinedKeypoints_phase2[i][0], IMG1_PredefinedKeypoints_phase2[i][1]);
-		Point2f p_img2(IMG2_PredefinedKeypoints_phase2[i][0], IMG2_PredefinedKeypoints_phase2[i][1]);
-
-		image1Points_phase2.push_back(p_img1);
-		image2Points_phase2.push_back(p_img2);
-
-	}*/
-
-	cout <<"After contours : "<< image1Points_phase2.size() << ", " << image2Points_phase2.size() << endl;
+	
 	for (int i = 0; i < image1Points.size(); i++) {
-		image1Points_phase2.push_back(image1Points[i]);
-		image2Points_phase2.push_back(image1Points[i]);
+		image1Points_phase2.push_back(image2Points[i]);
+		//image1Points_phase2.push_back(Point2f(image1Points[i].x - 10, image1Points[i].y + 10));
+		//image1Points_phase2.push_back(Point2f(image1Points[i].x + 10, image1Points[i].y - 10));
+		//image1Points_phase2.push_back(Point2f(image1Points[i].x + 10, image1Points[i].y + 10));
+
+		image2Points_phase2.push_back(image2Points[i]);
+		//image2Points_phase2.push_back(Point2f(image1Points[i].x - 10, image1Points[i].y + 10));
+		//image2Points_phase2.push_back(image1Points[i]);
+		//image2Points_phase2.push_back(Point2f(image1Points[i].x + 10, image1Points[i].y - 10));
+		//image2Points_phase2.push_back(Point2f(image1Points[i].x + 10, image1Points[i].y + 10));
 		//cout << image1Points[i] << step1_oripoints_trans[i] << endl;
 	}
 	
 	cout << "After adding step1-points : " << image1Points_phase2.size() << ", " << image2Points_phase2.size() << endl;
 	Mat m_homography_phase2;
 	vector<uchar> m_phase2;
-	m_homography_phase2 = findHomography(image1Points_phase2, image2Points_phase2, RANSAC, 3, m_phase2);
+	m_homography_phase2 = findHomography(image1Points_phase2, image2Points_phase2, LMEDS, 3, m_phase2);
 
 
 
+	Mat image_both_phase2;
+	warpPerspective(image_both, image_both_phase2, m_homography_phase2, img_1.size());
 
+	/*
 	Mat image_both_phase2 = Mat::zeros(img_2.size(), CV_8UC3);
 	vector<Point2f> points_phase2, points_trans_phase2;
 	for (int i = 0; i < img_2.rows; i++) {
@@ -785,6 +931,7 @@ int main(int argc, char** argv) {
 
 		}
 	}
+	*/
 	
 	//double alpha = 0.9;
 	//Mat mixed_image;
